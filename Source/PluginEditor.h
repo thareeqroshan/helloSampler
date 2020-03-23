@@ -17,8 +17,7 @@
 /**
 */
 class HelloSamplerAudioProcessorEditor  : public AudioProcessorEditor,
-                                          public FileDragAndDropTarget,
-                                          public Slider::Listener
+                                          public FileDragAndDropTarget
 {
 public:
     HelloSamplerAudioProcessorEditor (HelloSamplerAudioProcessor&);
@@ -31,7 +30,6 @@ public:
     bool isInterestedInFileDrag (const StringArray& files) override;
     void filesDropped (const StringArray& files, int x, int y) override;
     
-    void sliderValueChanged(Slider* slider) override;
 
 private:
     TextButton mLoadButton {"Load"};
@@ -40,6 +38,11 @@ private:
     
     Slider mAttackSlider, mDecaySlider, mSustainSlider, mReleaseSlider;
     Label mAttackLabel, mDecayLabel, mSustainLabel, mReleaseLabel;
+    
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mAttackAttachment;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mDecayAttachment;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mSustainAttachment;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mReleaseAttachment;
     
     HelloSamplerAudioProcessor& processor;
 

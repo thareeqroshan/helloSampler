@@ -15,7 +15,8 @@
 //==============================================================================
 /**
 */
-class HelloSamplerAudioProcessor  : public AudioProcessor
+class HelloSamplerAudioProcessor  : public AudioProcessor,
+                                    public ValueTree::Listener
 {
 public:
     //==============================================================================
@@ -65,10 +66,7 @@ public:
     
     ADSR::Parameters& getADSRParams(){return mADSRParams;}
     
-    float attack {0.0f};
-    float decay {0.0f};
-    float sustain {0.0f};
-    float release {0.0f};
+    AudioProcessorValueTreeState& getAPVTS() {return mAPTVS;}
 private:
     Synthesiser mSampler;
     const int mNumVoices {3};
@@ -78,6 +76,13 @@ private:
     
     AudioFormatManager mFormatManager;
     AudioFormatReader* mFormatReader { nullptr};
+    
+    AudioProcessorValueTreeState mAPTVS;
+    AudioProcessorValueTreeState::ParameterLayout createParamters();
+    
+    void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
+    
+    std::atomic<bool> mShouldUpdate {false};
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HelloSamplerAudioProcessor)

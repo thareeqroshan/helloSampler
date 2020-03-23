@@ -21,10 +21,11 @@ HelloSamplerAudioProcessor::HelloSamplerAudioProcessor()
                       #endif
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), mAPTVS(*this,nullptr,"PARAMETERS",createParamters())
 #endif
 {
     mFormatManager.registerBasicFormats();
+    mAPTVS.state.addListener(this);
     for(int i=0;i<mNumVoices;i++)
     {
         mSampler.addVoice(new SamplerVoice());
@@ -143,7 +144,10 @@ void HelloSamplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
+    if(mShouldUpdate){
+        updateADSRValue();
+    }
+    
     mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 
@@ -194,6 +198,7 @@ void HelloSamplerAudioProcessor::loadFile()
     range.setRange(0, 128, true);
     
     mSampler.addSound(new SamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10));
+    updateADSRValue();
 }
 
 void HelloSamplerAudioProcessor::loadFile(const String& path)
@@ -212,10 +217,16 @@ void HelloSamplerAudioProcessor::loadFile(const String& path)
     BigInteger range;
     range.setRange(0, 128, true);
     mSampler.addSound(new SamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10));
+    updateADSRValue();
 }
 
 void HelloSamplerAudioProcessor::updateADSRValue()
 {
+    mADSRParams.attack = mAPTVS.getRawParameterValue("ATTACK")->load();
+    mADSRParams.decay = mAPTVS.getRawParameterValue("DECAY")->load();
+    mADSRParams.sustain = mAPTVS.getRawParameterValue("SUSTAIN")->load();
+    mADSRParams.release = mAPTVS.getRawParameterValue("RELEASE")->load();
+    
     for(int i=0;i<mSampler.getNumSounds();++i)
     {
         if(auto sound = dynamic_cast<SamplerSound*>(mSampler.getSound(i).get()))
@@ -223,4 +234,22 @@ void HelloSamplerAudioProcessor::updateADSRValue()
             sound->setEnvelopeParameters(mADSRParams);
         }
     }
+}
+
+AudioProcessorValueTreeState::ParameterLayout HelloSamplerAudioProcessor::createParamters()
+{
+    std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
+    
+    parameters.push_back(std::make_unique<AudioParameterFloat>("ATTACK","Attack",0.0f,5.0f,0.0f));
+    parameters.push_back(std::make_unique<AudioParameterFloat>("DECAY","Decay",0.0f,3.0f,2.0f));
+    parameters.push_back(std::make_unique<AudioParameterFloat>("SUSTAIN","Sustain",0.0f,1.0f,1.0f));
+    parameters.push_back(std::make_unique<AudioParameterFloat>("RELEASE","Release",0.0f,5.0f,2.0f));
+    
+    
+    return {parameters.begin(),parameters.end()};
+}
+
+void HelloSamplerAudioProcessor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
+{
+    mShouldUpdate = true;
 }

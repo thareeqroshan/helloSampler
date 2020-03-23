@@ -21,8 +21,6 @@ HelloSamplerAudioProcessorEditor::HelloSamplerAudioProcessorEditor (HelloSampler
     mAttackSlider.setSliderStyle (Slider::SliderStyle::RotaryVerticalDrag);
     mAttackSlider.setTextBoxStyle (Slider::TextBoxBelow, false, 40, 20);
     mAttackSlider.setColour(Slider::ColourIds::thumbColourId, Colours::red);
-    mAttackSlider.setRange (0.0f, 5.0f,0.01f);
-    mAttackSlider.addListener(this);
     addAndMakeVisible(mAttackSlider);
     
     mAttackLabel.setFont(10.0f);
@@ -31,11 +29,11 @@ HelloSamplerAudioProcessorEditor::HelloSamplerAudioProcessorEditor (HelloSampler
     mAttackLabel.setJustificationType(Justification::centredTop);
     mAttackLabel.attachToComponent(&mAttackSlider, false);
     
+    mAttackAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(),"ATTACK",mAttackSlider);
+    
     mDecaySlider.setSliderStyle (Slider::SliderStyle::RotaryVerticalDrag);
     mDecaySlider.setTextBoxStyle (Slider::TextBoxBelow, false, 40, 20);
     mDecaySlider.setColour(Slider::ColourIds::thumbColourId, Colours::red);
-    mDecaySlider.setRange (0.0f, 5.0f,0.01f);
-    mDecaySlider.addListener(this);
     addAndMakeVisible(mDecaySlider);
     
     mDecayLabel.setFont(10.0f);
@@ -44,12 +42,14 @@ HelloSamplerAudioProcessorEditor::HelloSamplerAudioProcessorEditor (HelloSampler
     mDecayLabel.setJustificationType(Justification::centredTop);
     mDecayLabel.attachToComponent(&mDecaySlider, false);
     
+    mDecayAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(),"DECAY",mDecaySlider);
+    
     mSustainSlider.setSliderStyle (Slider::SliderStyle::RotaryVerticalDrag);
     mSustainSlider.setTextBoxStyle (Slider::TextBoxBelow, false, 40, 20);
     mSustainSlider.setColour(Slider::ColourIds::thumbColourId, Colours::red);
     mSustainSlider.setRange (0.0f, 1.0f,0.01f);
-    mSustainSlider.addListener(this);
     addAndMakeVisible(mSustainSlider);
+    
     
     mSustainLabel.setFont(10.0f);
     mSustainLabel.setText("Sustain", NotificationType::dontSendNotification);
@@ -57,11 +57,11 @@ HelloSamplerAudioProcessorEditor::HelloSamplerAudioProcessorEditor (HelloSampler
     mSustainLabel.setJustificationType(Justification::centredTop);
     mSustainLabel.attachToComponent(&mSustainSlider, false);
     
+    mSustainAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(),"SUSTAIN",mSustainSlider);
+    
     mReleaseSlider.setSliderStyle (Slider::SliderStyle::RotaryVerticalDrag);
     mReleaseSlider.setTextBoxStyle (Slider::TextBoxBelow, false, 40, 20);
     mReleaseSlider.setColour(Slider::ColourIds::thumbColourId, Colours::red);
-    mReleaseSlider.setRange (0.0f, 5.0f,0.01f);
-    mReleaseSlider.addListener(this);
     addAndMakeVisible(mReleaseSlider);
     
     mReleaseLabel.setFont(10.0f);
@@ -69,6 +69,8 @@ HelloSamplerAudioProcessorEditor::HelloSamplerAudioProcessorEditor (HelloSampler
     mReleaseLabel.setColour(Label::ColourIds::textColourId, Colours::green);
     mReleaseLabel.setJustificationType(Justification::centredTop);
     mReleaseLabel.attachToComponent(&mReleaseSlider, false);
+    
+    mReleaseAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(),"RELEASE",mReleaseSlider);
     
     setSize (600, 200);
 }
@@ -162,23 +164,4 @@ void HelloSamplerAudioProcessorEditor::filesDropped(const StringArray& files, in
     repaint();
 }
 
-void HelloSamplerAudioProcessorEditor::sliderValueChanged(Slider* slider)
-{
-    if (slider == &mAttackSlider)
-    {
-        processor.getADSRParams().attack = mAttackSlider.getValue();
-    }
-    else if (slider == &mDecaySlider)
-    {
-        processor.getADSRParams().decay = mDecaySlider.getValue();
-    }
-    else if (slider ==  &mSustainSlider)
-    {
-        processor.getADSRParams().sustain = mSustainSlider.getValue();
-    }
-    else if (slider == &mReleaseSlider)
-    {
-        processor.getADSRParams().release = mReleaseSlider.getValue();
-    }
-    processor.updateADSRValue();
-}
+
