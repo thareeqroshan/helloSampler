@@ -11,6 +11,12 @@
       <FILE id="SNXdyW" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="hsHSag" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="Nch6V1" name="ADSRComponent.cpp" compile="1" resource="0"
+            file="Source/ADSRComponent.cpp"/>
+      <FILE id="TUuXAB" name="ADSRComponent.h" compile="0" resource="0" file="Source/ADSRComponent.h"/>
+      <FILE id="yK4bw7" name="WaveThumbnail.cpp" compile="1" resource="0"
+            file="Source/WaveThumbnail.cpp"/>
+      <FILE id="Eb58Mz" name="WaveThumbnail.h" compile="0" resource="0" file="Source/WaveThumbnail.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
