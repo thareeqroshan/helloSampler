@@ -62,4 +62,3 @@ Image HelloSamplerAudioProcessorEditor::loadImage()
     
    // image.getChildFile (<#StringRef relativeOrAbsolutePath#>)
 }
-
